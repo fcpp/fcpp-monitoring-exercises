@@ -58,7 +58,7 @@ namespace tags {
 FUN bool consistency_monitor(ARGS, bool cluster, bool warning) { CODE
     using namespace logic;
     // execute independently in different groups
-    return switcher(CALL, node.uid/100, [&](){
+    return switcher(CALL, node.uid/max_group_size, [&](){
         bool alert_start = Y(CALL, !cluster) & cluster;
         bool alert_end = Y(CALL, cluster) & (!cluster);
         bool all_alerted = G(CALL, cluster);

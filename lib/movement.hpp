@@ -16,6 +16,10 @@
  */
 namespace fcpp {
 
+const int max_group_size = 100;
+const int hi_x = 1200;
+const int hi_y = 800;
+
 //! @brief Namespace containing the libraries of coordination routines.
 namespace coordination {
 
@@ -32,9 +36,9 @@ FUN void group_walk(ARGS) { CODE
     using namespace tags;
 
     vec<2> low = {0, 0};
-    vec<2> hi = {1200, 800};
+    vec<2> hi = {hi_x, hi_y};
     times_t period = 1;
-    device_t leader = node.uid - (node.uid % 100);
+    device_t leader = node.uid - (node.uid % max_group_size);
     real_t max_v = node.storage(speed{});
     real_t radius = node.storage(offset{});
     if (node.uid == leader) {
@@ -75,7 +79,7 @@ namespace option {
     >;
 
     //! @brief The distribution of initial node positions (random in a 1200x800 rectangle).
-    using rectangle_d = distribution::rect_n<1, 0, 0, 1200, 800>;
+    using rectangle_d = distribution::rect_n<1, 0, 0, hi_x, hi_y>;
 
     //! @brief Template asserting a condition on an FCPP option.
     template <bool condition>
@@ -89,11 +93,11 @@ namespace option {
     template <int group_id, int group_size, int group_radius, int group_speed = 0, int start_time = 0>
     DECLARE_OPTIONS(spawn_group,
         option_assert<group_id >= 0>, // group ID should be positive
-        option_assert<0 < group_size and group_size < 100>, // group size allowed between 1 and 99
+        option_assert<0 < group_size and group_size < max_group_size>, // group size allowed between 1 and 99
         // group_size spawn events all at start_time
         spawn_schedule<sequence::multiple_n<group_size, start_time>>,
         init<
-            uid,    arithmetic_sequence<device_t, 100 * group_id, 1>, // arithmetic sequence of device IDs
+            uid,    arithmetic_sequence<device_t, max_group_size * group_id, 1>, // arithmetic sequence of device IDs
             x,      rectangle_d, // random displacement of devices in the simulation area
             speed,  distribution::constant_n<double, group_speed>, // store the group speed
             offset, distribution::constant_n<double, group_radius> // store the group radius
