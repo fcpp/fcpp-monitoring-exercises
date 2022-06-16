@@ -39,23 +39,19 @@ namespace tags {
 // [AGGREGATE PROGRAM]
 
 /**
- * EXERCISES:
+ * EXERCISES
  *
- * Expand the MAIN function below to compute the following:
+ * Monitor the following additional properties:
  *
- * 1)    The number of neighbour devices.
+ * 1)    You do not enter a cluster without a previous warning.
  *
- * 2)    The maximum number of neighbour devices ever witnessed by the current device.
- *
- * 3)    The maximum number of neighbour devices ever witnessed by any device in the network.
- *
- * 4)    Move towards the neighbour with the lowest number of neighbours.
+ * 2)    You do not enter a cluster without some member of your group having a warning.
  *
  * Every exercise above is designed to help solving the following one.
  */
 
 //! @brief If some node is in cluster alert, it stays alerted until everyone in its group becomes in cluster alert.
-FUN bool consistency_monitor(ARGS, bool cluster, bool warning) { CODE
+FUN bool consistency_monitor(ARGS, bool cluster) { CODE
     using namespace logic;
     // execute independently in different groups
     return switcher(CALL, node.uid/max_group_size, [&](){
@@ -78,7 +74,7 @@ MAIN() {
 
     // compute basic propositions
     bool cluster = sum_hood(CALL, mux(node.nbr_dist() < 0.1*communication_range, 1, 0)) > 10;
-    bool warning = sum_hood(CALL, mux(node.nbr_dist() < 0.5*communication_range, 1, 0)) > 5;
+    bool warning = sum_hood(CALL, mux(cluster, 1, 0)) >= 3; // at least 3 neighbours in a cluster
 
     // sample logic formula
     bool result = consistency_monitor(CALL, cluster, warning);
