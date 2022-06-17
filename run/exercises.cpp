@@ -138,11 +138,22 @@ DECLARE_OPTIONS(list,
     shape_tag<node_shape>, // the shape of a node is read from this tag in the store
     size_tag<node_size>,   // the size  of a node is read from this tag in the store
     color_tag<node_color>, // the color of a node is read from this tag in the store
-    spawn_group<0, 1,   0, 20>, // group 0: a single node moving fast
+    spawn_group<0, 1,   0, 20>, // group 0: a single node biking
     spawn_group<1, 20, 50,  0>, // group 1: a large group staying still
-    spawn_group<2, 10, 20, 10>, // group 2: a medium sized, tightly packed group moving normally
-    spawn_group<3, 10, 80, 10>  // group 3: a medium sized, loosely packed group moving normally
+    spawn_group<2, 10, 20,  5>, // group 2: a medium sized, tightly packed group walking
+    spawn_group<3, 10, 80,  5>  // group 3: a medium sized, loosely packed group walking
     // add groups as you wish
+    /**
+     * realistic urban speeds:
+     * - standing:  0 km/h
+     * - strolling: 3 km/h
+     * - walking:   5 km/h
+     * - running:  10 km/h
+     * - biking:   20 km/h
+     * - slow car: 30 km/h
+     * - fast car: 50 km/h
+     * - drone:    80 km/h
+     */
 );
 
 } // namespace option

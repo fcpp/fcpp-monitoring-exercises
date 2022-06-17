@@ -104,7 +104,7 @@ namespace option {
         init<
             uid,    arithmetic_sequence<device_t, max_group_size * group_id, 1>, // arithmetic sequence of device IDs
             x,      rectangle_d, // random displacement of devices in the simulation area
-            speed,  distribution::constant_n<double, group_speed>, // store the group speed
+            speed,  distribution::constant_n<double, group_speed * 1000, 3600>, // store the group speed, converting from km/h to m/s
             offset, distribution::constant_n<double, group_radius> // store the group radius
         >
     );
