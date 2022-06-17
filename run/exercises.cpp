@@ -77,7 +77,7 @@ MAIN() {
     bool warning = sum_hood(CALL, mux(cluster, 1, 0)) >= 3; // at least 3 neighbours in a cluster
 
     // sample logic formula
-    bool result = consistency_monitor(CALL, cluster, warning);
+    bool result = consistency_monitor(CALL, cluster);
     node.storage(consistency{}) = result;
 
     // display formula values in the user interface
