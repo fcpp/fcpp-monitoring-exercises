@@ -114,7 +114,8 @@ using store_t = tuple_store<
     node_color,                 color,
     node_size,                  double,
     node_shape,                 shape,
-    consistency,                bool
+    consistency,                bool,
+    debug,                      std::string
 >;
 //! @brief The tags and corresponding aggregators to be logged (change as needed).
 using aggregator_t = aggregators<
@@ -174,7 +175,7 @@ int main() {
     //! @brief Create the navigator from the obstacles map.
     map_navigator obj = map_navigator("obstacles.png");
     //! @brief The initialisation values (simulation name).
-    auto init_v = common::make_tagged_tuple<option::name, option::texture, option::map_navigator_obj>("Monitoring Exercises", "map.jpg", obj);
+    auto init_v = common::make_tagged_tuple<option::name, option::texture, option::map_navigator_obj>("Monitoring Exercises", "obstacles.png", obj);
     //! @brief Construct the network object.
     net_t network{init_v};
     //! @brief Run the simulation until exit.
