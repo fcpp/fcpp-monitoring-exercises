@@ -16,9 +16,12 @@
  */
 namespace fcpp {
 
-const int max_group_size = 100;
-const int hi_x = 1200;
-const int hi_y = 800;
+//! @brief Maximum allowed group size.
+constexpr int max_group_size = 100;
+//! @brief Width of the map.
+constexpr int hi_x = 1200;
+//! @brief Height of the map.
+constexpr int hi_y = 800;
 
 //! @brief Namespace containing the libraries of coordination routines.
 namespace coordination {
@@ -35,15 +38,23 @@ namespace tags {
 
 //! @brief Reaches a target position following streets.
 FUN real_t reach_on_streets(ARGS, vec<2> target, real_t max_v, times_t period) { CODE
-    vec<2> t = node.net.path_to(node.position(), node.net.closest_space(target));
-    node.storage(tags::debug{}) = to_string(make_tuple("sp:", node.net.closest_space(node.position()), "ob:", node.net.closest_obstacle(node.position()), "target:", target, "path:", t));
+    constexpr real_t k = 0.75;
+    vec<2> v = old(CALL, make_vec(0,0), [&](vec<2> ov){
+        return k*ov + node.position() - old(CALL, node.position());
+    }) * (1-k);
+    target = node.net.closest_space(target);
+    vec<2> t = node.net.path_to(node.position(), target);
     if (isnan(t[0]) or isnan(t[1]))
-        t = node.position();
+        t = target;
     if (target[0] < 0 or target[1] < 0 or target[0] > 1200 or target[1] > 800)
-        t = node.position();
+        t = target;
+    if (node.position() - t < 0.01)
+        t = target;
+    if (time_since(CALL, v < 0.1) < 10 and node.current_time() > 50)
+        t = target;
     return follow_target(CALL, t, max_v, period);
 }
-FUN_EXPORT reach_on_streets_t = export_list<point_gravitational_force_t, neighbour_gravitational_force_t>;
+FUN_EXPORT reach_on_streets_t = export_list<vec<2>, time_since_t>;
 
 //! @brief Regulates random movement in groups.
 FUN void group_walk(ARGS) { CODE
@@ -79,7 +90,7 @@ FUN void group_walk(ARGS) { CODE
 FUN_EXPORT group_walk_t = export_list<rectangle_walk_t<2>, constant_t<vec<2>>, reach_on_streets_t, bool>;
 
 //! @brief Executes a program independently in a partition of the network based on the value of a given key.
-GEN(T, G) auto switcher(ARGS, T&& key, G&& f) { CODE
+GEN(T, G) auto split(ARGS, T&& key, G&& f) { CODE
     internal::trace_key trace_process(node.stack_trace, key);
     return f();
 }

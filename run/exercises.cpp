@@ -54,7 +54,7 @@ namespace tags {
 FUN bool consistency_monitor(ARGS, bool cluster) { CODE
     using namespace logic;
     // execute independently in different groups
-    return switcher(CALL, node.uid/max_group_size, [&](){
+    return split(CALL, node.uid/max_group_size, [&](){
         bool alert_start = Y(CALL, !cluster) & cluster;
         bool alert_end = Y(CALL, cluster) & (!cluster);
         bool all_alerted = G(CALL, cluster);
@@ -175,7 +175,7 @@ int main() {
     //! @brief Create the navigator from the obstacles map.
     map_navigator obj = map_navigator("obstacles.png");
     //! @brief The initialisation values (simulation name).
-    auto init_v = common::make_tagged_tuple<option::name, option::texture, option::map_navigator_obj>("Monitoring Exercises", "obstacles.png", obj);
+    auto init_v = common::make_tagged_tuple<option::name, option::texture, option::map_navigator_obj>("Monitoring Exercises", "map.jpg", obj);
     //! @brief Construct the network object.
     net_t network{init_v};
     //! @brief Run the simulation until exit.
