@@ -127,7 +127,7 @@ namespace option {
     struct option_assert<true> {};
 
     //! @brief Option generating a group of nodes moving together.
-    template <int group_id, int group_size, int group_radius, int group_speed = 0, int start_time = 0>
+    template <int group_id, int group_size, int group_radius, int group_speed = 0, int start_time = 0, int x_pos = -1, int y_pos = -1>
     DECLARE_OPTIONS(spawn_group,
         option_assert<group_id >= 0>, // group ID should be positive
         option_assert<0 < group_size and group_size < max_group_size>, // group size allowed between 1 and 99
@@ -135,7 +135,7 @@ namespace option {
         spawn_schedule<sequence::multiple_n<group_size, start_time>>,
         init<
             uid,    arithmetic_sequence<device_t, max_group_size * group_id, 1>, // arithmetic sequence of device IDs
-            x,      rectangle_d, // random displacement of devices in the simulation area
+	    x,      std::conditional_t<x_pos == -1, rectangle_d, distribution::point_n<1,x_pos,y_pos>>, // random displacement of devices in the simulation area
             speed,  distribution::constant_n<double, group_speed * 1000, 3600>, // store the group speed, converting from km/h to m/s
             offset, distribution::constant_n<double, group_radius> // store the group radius
         >
