@@ -47,6 +47,10 @@ namespace tags {
  *
  * 2)    You do not enter a cluster without some member of your group having a warning.
  *
+ * 3)    You can always reach a node that is not in a cluster.
+ *
+ * 4)    You can always reach a node that has never been in a cluster.
+ *
  * Every exercise above is designed to help solving the following one.
  */
 
