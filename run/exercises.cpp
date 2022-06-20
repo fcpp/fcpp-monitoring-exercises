@@ -78,7 +78,7 @@ MAIN() {
 
     // compute basic propositions
     bool warning = sum_hood(CALL, mux(node.nbr_dist() < 0.25*communication_range, 1, 0)) > 5; // more than 5 neighbours within 25m?
-    bool cluster = sum_hood(CALL, mux(warning, 1, 0)) >= 3; // at least 3 neighbours also on "warning"?
+    bool cluster = sum_hood(CALL, mux(nbr(CALL, warning), 1, 0)) >= 3; // at least 3 neighbours also on "warning"?
 
     // sample logic formula
     bool monitor_result = consistency_monitor(CALL, cluster);
