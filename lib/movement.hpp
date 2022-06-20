@@ -80,6 +80,10 @@ FUN void group_walk(ARGS) { CODE
         // followers chase the leader up to an offset
         vec<2> t = random_rectangle_target(CALL, make_vec(-radius, -radius), make_vec(radius, radius));
         t = constant(CALL, t) + node.net.node_at(leader).position();
+        auto fit_bounds = [](real_t v, real_t mx){
+            return max(real_t(0), min(v, mx));
+        };
+        t = make_vec(fit_bounds(t[0], hi_x), fit_bounds(t[1], hi_y));
         if (first_round)
             node.position() = node.net.closest_space(t); // on the first simulated round
         else

@@ -122,6 +122,8 @@ using aggregator_t = aggregators<
     consistency,                aggregator::mean<double>
 >;
 
+//! @brief Plot description.
+using plotter_t = plot::split<plot::time, plot::values<aggregator_t, common::type_sequence<>, consistency>>;
 
 //! @brief The general simulation options.
 DECLARE_OPTIONS(list,
@@ -134,16 +136,17 @@ DECLARE_OPTIONS(list,
     log_schedule<log_s>,     // the sequence generator for log events on the network
     store_t,       // the contents of the node storage
     aggregator_t,  // the tags and corresponding aggregators to be logged
+    plot_type<plotter_t>, // the plot description
     area<0, 0, hi_x, hi_y>, // bounding coordinates of the simulated space
     connector<connect::fixed<communication_range>>, // connection allowed within a fixed comm range
     shape_tag<node_shape>, // the shape of a node is read from this tag in the store
     size_tag<node_size>,   // the size  of a node is read from this tag in the store
     color_tag<node_color>, // the color of a node is read from this tag in the store
     // group-id, number of nodes in group, radius, speed:
-    spawn_group<0, 1,   0, 20>, // group 0: a single node biking
-    spawn_group<1, 20, 50,  3>, // group 1: a large group strolling
-    spawn_group<2, 10, 20,  5>, // group 2: a medium sized, tightly packed group walking
-    spawn_group<3, 10, 80,  5>, // group 3: a medium sized, loosely packed group walking
+    spawn_group<0, 1,  0,   20>, // group 0: a single node biking
+    spawn_group<1, 20, 50,  3>,  // group 1: a large group strolling
+    spawn_group<2, 10, 20,  5>,  // group 2: a medium sized, tightly packed group walking
+    spawn_group<3, 10, 80,  5>,  // group 3: a medium sized, loosely packed group walking
     spawn_group<4, 40, 200, 10>
     // add groups as you wish
     /**
@@ -176,11 +179,18 @@ int main() {
     using net_t = component::interactive_simulator<option::list>::net;
     //! @brief Create the navigator from the obstacles map.
     map_navigator obj = map_navigator("obstacles.png"); // remove argument for ignoring obstacles
+    //! @brief Create the plotter object.
+    option::plotter_t p;
     //! @brief The initialisation values (simulation name).
-    auto init_v = common::make_tagged_tuple<option::name, option::texture, option::map_navigator_obj>("Monitoring Exercises", "map.jpg", obj);
-    //! @brief Construct the network object.
-    net_t network{init_v};
-    //! @brief Run the simulation until exit.
-    network.run();
+    auto init_v = common::make_tagged_tuple<option::name, option::texture, option::map_navigator_obj, option::plotter>("Monitoring Exercises", "map.jpg", obj, &p);
+    std::cout << "/*\n"; // avoid simulation output to interfere with plotting output
+    {
+        //! @brief Construct the network object.
+        net_t network{init_v};
+        //! @brief Run the simulation until exit.
+        network.run();
+    }
+    std::cout << "*/\n"; // avoid simulation output to interfere with plotting output
+    std::cout << plot::file("exercises", p.build()); // write plots
     return 0;
 }
