@@ -73,17 +73,17 @@ MAIN() {
     group_walk(CALL);
 
     // compute basic propositions
-    bool cluster = sum_hood(CALL, mux(node.nbr_dist() < 0.1*communication_range, 1, 0)) > 10;
-    bool warning = sum_hood(CALL, mux(cluster, 1, 0)) >= 3; // at least 3 neighbours in a cluster
+    bool warning = sum_hood(CALL, mux(node.nbr_dist() < 0.25*communication_range, 1, 0)) > 5; // more than 5 neighbours within 25m?
+    bool cluster = sum_hood(CALL, mux(warning, 1, 0)) >= 3; // at least 3 neighbours also on "warning"?
 
     // sample logic formula
-    bool result = consistency_monitor(CALL, cluster);
-    node.storage(consistency{}) = result;
+    bool monitor_result = consistency_monitor(CALL, cluster);
+    node.storage(consistency{}) = monitor_result;
 
     // display formula values in the user interface
-    node.storage(node_size{}) = result ? 10 : 20;
-    node.storage(node_color{}) = color(cluster ? RED : GREEN);
-    node.storage(node_shape{}) = warning ? shape::cube : shape::sphere;
+    node.storage(node_size{}) = cluster ? 20 : 10;
+    node.storage(node_color{}) = color(monitor_result ? GREEN : RED);
+    node.storage(node_shape{}) = warning ? shape::star : shape::sphere;
 }
 //! @brief Export types used by the main function (update it when expanding the program).
 FUN_EXPORT main_t = export_list<group_walk_t, monitor_t>;
@@ -134,15 +134,17 @@ DECLARE_OPTIONS(list,
     log_schedule<log_s>,     // the sequence generator for log events on the network
     store_t,       // the contents of the node storage
     aggregator_t,  // the tags and corresponding aggregators to be logged
-    area<0, 0, 1200, 800>, // bounding coordinates of the simulated space
+    area<0, 0, hi_x, hi_y>, // bounding coordinates of the simulated space
     connector<connect::fixed<communication_range>>, // connection allowed within a fixed comm range
     shape_tag<node_shape>, // the shape of a node is read from this tag in the store
     size_tag<node_size>,   // the size  of a node is read from this tag in the store
     color_tag<node_color>, // the color of a node is read from this tag in the store
+    // group-id, number of nodes in group, radius, speed:
     spawn_group<0, 1,   0, 20>, // group 0: a single node biking
-    spawn_group<1, 20, 50,  0>, // group 1: a large group staying still
+    spawn_group<1, 20, 50,  3>, // group 1: a large group strolling
     spawn_group<2, 10, 20,  5>, // group 2: a medium sized, tightly packed group walking
-    spawn_group<3, 10, 80,  5>  // group 3: a medium sized, loosely packed group walking
+    spawn_group<3, 10, 80,  5>, // group 3: a medium sized, loosely packed group walking
+    spawn_group<4, 40, 200, 10>
     // add groups as you wish
     /**
      * realistic urban speeds:
@@ -173,7 +175,7 @@ int main() {
     //! @brief The network object type (interactive simulator with given options).
     using net_t = component::interactive_simulator<option::list>::net;
     //! @brief Create the navigator from the obstacles map.
-    map_navigator obj = map_navigator("obstacles.png");
+    map_navigator obj = map_navigator("obstacles.png"); // remove argument for ignoring obstacles
     //! @brief The initialisation values (simulation name).
     auto init_v = common::make_tagged_tuple<option::name, option::texture, option::map_navigator_obj>("Monitoring Exercises", "map.jpg", obj);
     //! @brief Construct the network object.

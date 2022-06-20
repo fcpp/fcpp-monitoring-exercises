@@ -46,7 +46,7 @@ FUN real_t reach_on_streets(ARGS, vec<2> target, real_t max_v, times_t period) {
     vec<2> t = node.net.path_to(node.position(), target);
     if (isnan(t[0]) or isnan(t[1]))
         t = target;
-    if (target[0] < 0 or target[1] < 0 or target[0] > 1200 or target[1] > 800)
+    if (target[0] < 0 or target[1] < 0 or target[0] > hi_x or target[1] > hi_y)
         t = target;
     if (node.position() - t < 0.01)
         t = target;
