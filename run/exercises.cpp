@@ -6,6 +6,9 @@
  */
 
 // [INTRODUCTION]
+
+#define FCPP_WARNING_TRACE false
+
 //! Importing the FCPP library.
 #include "lib/fcpp.hpp"
 #include "lib/past_ctl.hpp"
@@ -65,6 +68,9 @@ FUN bool consistency_monitor(ARGS, bool cluster) { CODE
         bool no_new_alarms_after_all_alerted = AS(CALL, !alert_start, all_alerted);
         // if the alert is ending, there must have been no new alarms after a moment when everyone was alerted
         return alert_end <= no_new_alarms_after_all_alerted;
+        // notice that boolean operators to be used are &, |, !, <=
+        // in particular A <= B is used for "A implies B", which feels reversed
+        // (the reason being that <= is also less-than-or-equal on booleans)
     });
 }
 FUN_EXPORT monitor_t = export_list<past_ctl_t, slcs_t>;
