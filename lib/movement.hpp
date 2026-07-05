@@ -43,7 +43,7 @@ FUN real_t reach_on_streets(ARGS, vec<2> target, real_t max_v, times_t period) {
         return k*ov + node.position() - old(CALL, node.position());
     }) * (1-k);
     target = node.net.closest_space(target);
-    vec<2> t = node.net.path_to(node.position(), target);
+    vec<2> t = get<0>(node.net.path_to(node.position(), target));
     if (isnan(t[0]) or isnan(t[1]))
         t = target;
     if (target[0] < 0 or target[1] < 0 or target[0] > hi_x or target[1] > hi_y)
@@ -92,12 +92,6 @@ FUN void group_walk(ARGS) { CODE
 }
 //! @brief Export types used by the group_walk function.
 FUN_EXPORT group_walk_t = export_list<rectangle_walk_t<2>, constant_t<vec<2>>, reach_on_streets_t, bool>;
-
-//! @brief Executes a program independently in a partition of the network based on the value of a given key.
-GEN(T, G) auto split(ARGS, T&& key, G&& f) { CODE
-    internal::trace_key trace_process(node.stack_trace, key);
-    return f();
-}
 
 }
 

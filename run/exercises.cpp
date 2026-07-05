@@ -11,8 +11,6 @@
 
 //! Importing the FCPP library.
 #include "lib/fcpp.hpp"
-#include "lib/past_ctl.hpp"
-#include "lib/slcs.hpp"
 #include "lib/movement.hpp"
 
 /**
@@ -192,7 +190,7 @@ int main() {
     //! @brief Create the plotter object.
     option::plotter_t p;
     //! @brief The initialisation values (simulation name).
-    auto init_v = common::make_tagged_tuple<option::name, option::texture, option::map_navigator_obj, option::plotter>("Monitoring Exercises", "map.jpg", obj, &p);
+    auto init_v = common::make_tagged_tuple<option::name, option::texture, option::navigator, option::plotter>("Monitoring Exercises", "map.jpg", obj, &p);
     std::cout << "/*\n"; // avoid simulation output to interfere with plotting output
     {
         //! @brief Construct the network object.
